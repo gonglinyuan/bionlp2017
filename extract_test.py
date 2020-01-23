@@ -33,9 +33,9 @@ def preproc(infile, outfile):
 if __name__ == "__main__":
     
     noteevents_file = sys.argv[1]
-    print 'First stage of preprocessing'
+    print('First stage of preprocessing')
     prepreproc(noteevents_file, 'mimic_raw_preprocessed.txt')
-    print 'Finished'
+    print('Finished')
     
     print('Second stage of preprocessing')
     preproc('mimic_raw_preprocessed.txt', 'mimic_preprocessed.txt')

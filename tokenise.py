@@ -43,7 +43,7 @@ TOKEN = re.compile(r"(\S+)\s")
 
 # Common accent letters.
 DIACRITICS = \
-diacritics = u"àáâãäåąāæçćčςďèéêëēěęģìíîïīłįķļľņñňńйðòóôõöøþřšťùúûüůųýÿўžż"
+diacritics = "àáâãäåąāæçćčςďèéêëēěęģìíîïīłįķļľņñňńйðòóôõöøþřšťùúûüůųýÿўžż"
 
 # Common punctuation marks.
 PUNCTUATION = \
@@ -77,37 +77,37 @@ replacements = {
 # Common emoticons.
 EMOTICONS = \
 emoticons = { # (facial expression, sentiment)-keys
-    ("love" , +1.00): set(("<3", u"♥", u"❤")),
+    ("love" , +1.00): set(("<3", "♥", "❤")),
     ("grin" , +1.00): set((">:D", ":-D", ":D", "=-D", "=D", "X-D", "x-D", "XD", "xD", "8-D")),
     ("taunt", +0.75): set((">:P", ":-P", ":P", ":-p", ":p", ":-b", ":b", ":c)", ":o)", ":^)")),
     ("smile", +0.50): set((">:)", ":-)", ":)", "=)", "=]", ":]", ":}", ":>", ":3", "8)", "8-)")),
     ("wink" , +0.25): set((">;]", ";-)", ";)", ";-]", ";]", ";D", ";^)", "*-)", "*)")),
     ("blank", +0.00): set((":-|", ":|")),
-    ("gasp" , -0.05): set((">:o", ":-O", ":O", ":o", ":-o", "o_O", "o.O", u"°O°", u"°o°")),
+    ("gasp" , -0.05): set((">:o", ":-O", ":O", ":o", ":-o", "o_O", "o.O", "°O°", "°o°")),
     ("worry", -0.25): set((">:/",  ":-/", ":/", ":\\", ">:\\", ":-.", ":-s", ":s", ":S", ":-S", ">.>")),
     ("frown", -0.75): set((">:[", ":-(", ":(", "=(", ":-[", ":[", ":{", ":-<", ":c", ":-c", "=/")),
     ("cry"  , -1.00): set((":'(", ":'''(", ";'("))
 }
 
-RE_EMOTICONS = [r" ?".join(map(re.escape, e)) for v in EMOTICONS.values() for e in v]
+RE_EMOTICONS = [r" ?".join(map(re.escape, e)) for v in list(EMOTICONS.values()) for e in v]
 RE_EMOTICONS = re.compile(r"(%s)($|\s)" % "|".join(RE_EMOTICONS))
 
 # Common emoji.
 EMOJI = \
 emoji = { # (facial expression, sentiment)-keys
-    ("love" , +1.00): set((u"❤️", u"💜", u"💚", u"💙", u"💛", u"💕")),
-    ("grin" , +1.00): set((u"😀", u"😄", u"😃", u"😆", u"😅", u"😂", u"😁", u"😻", u"😍", u"😈", u"👌")),
-    ("taunt", +0.75): set((u"😛", u"😝", u"😜", u"😋", u"😇")),
-    ("smile", +0.50): set((u"😊", u"😌", u"😏", u"😎", u"☺", u"👍")),
-    ("wink" , +0.25): set((u"😉")),
-    ("blank", +0.00): set((u"😐", u"😶")),
-    ("gasp" , -0.05): set((u"😳", u"😮", u"😯", u"😧", u"😦", u"🙀")),
-    ("worry", -0.25): set((u"😕", u"😬")),
-    ("frown", -0.75): set((u"😟", u"😒", u"😔", u"😞", u"😠", u"😩", u"😫", u"😡", u"👿")),
-    ("cry"  , -1.00): set((u"😢", u"😥", u"😓", u"😪", u"😭", u"😿")),
+    ("love" , +1.00): set(("❤️", "💜", "💚", "💙", "💛", "💕")),
+    ("grin" , +1.00): set(("😀", "😄", "😃", "😆", "😅", "😂", "😁", "😻", "😍", "😈", "👌")),
+    ("taunt", +0.75): set(("😛", "😝", "😜", "😋", "😇")),
+    ("smile", +0.50): set(("😊", "😌", "😏", "😎", "☺", "👍")),
+    ("wink" , +0.25): set(("😉")),
+    ("blank", +0.00): set(("😐", "😶")),
+    ("gasp" , -0.05): set(("😳", "😮", "😯", "😧", "😦", "🙀")),
+    ("worry", -0.25): set(("😕", "😬")),
+    ("frown", -0.75): set(("😟", "😒", "😔", "😞", "😠", "😩", "😫", "😡", "👿")),
+    ("cry"  , -1.00): set(("😢", "😥", "😓", "😪", "😭", "😿")),
 }
 
-RE_EMOJI = [e for v in EMOJI.values() for e in v]
+RE_EMOJI = [e for v in list(EMOJI.values()) for e in v]
 RE_EMOJI = re.compile(r"(\s?)(%s)(\s?)" % "|".join(RE_EMOJI))
 
 # Mention marker: "@tomdesmedt".
@@ -131,14 +131,14 @@ def tokenize(string, punctuation=PUNCTUATION, abbreviations=ABBREVIATIONS,
     # Handle punctuation.
     punctuation = tuple(punctuation)
     # Handle replacements (contractions).
-    for a, b in replace.items():
+    for a, b in list(replace.items()):
         string = re.sub(a, b, string)
     # Handle Unicode quotes.
     if isinstance(string, str):
-        string = string.replace(u"“", u" “ ")
-        string = string.replace(u"”", u" ” ")
-        string = string.replace(u"‘", u" ‘ ")
-        string = string.replace(u"’", u" ’ ")
+        string = string.replace("“", " “ ")
+        string = string.replace("”", " ” ")
+        string = string.replace("‘", " ‘ ")
+        string = string.replace("’", " ’ ")
     # Collapse whitespace.
     string = re.sub("\r\n", "\n", string)
     string = re.sub(linebreak, " %s " % EOS, string)
@@ -177,7 +177,7 @@ def tokenize(string, punctuation=PUNCTUATION, abbreviations=ABBREVIATIONS,
             tokens.extend(reversed(tail))
     # Handle citations (periods + quotes).
     if isinstance(string, str):
-        quotes = ("'", "\"", u"”", u"’")
+        quotes = ("'", "\"", "”", "’")
     else:
         quotes = ("'", "\"")
     # Handle sentence breaks (periods, quotes, parenthesis).
