@@ -1,12 +1,17 @@
-from tokenise import tokenize
 import re
 import json
 import sys
+from multiprocessing import Pool
+
+from tqdm import tqdm
+
+from tokenise import tokenize
+
 
 valid_checker = re.compile(r'(^[^\d\W])[^\d\W]*(-[^\d\W]*)*([^\d\W]$)')
 
-def prepreproc(infile, outfile):
 
+def prepreproc(infile, outfile):
     with open(infile, 'r') as f:
         text = f.read()
         with open(outfile, 'w') as g:
@@ -14,24 +19,30 @@ def prepreproc(infile, outfile):
             text = re.sub("\n\n", "\n", text)
             g.write(text)
 
+
 def preproc(infile, outfile):
+
+    def preproc_one(line):
+        if line:
+            sentences = tokenize(line)
+            preproc_lines = []
+            for sentence in sentences:
+                preproc_line = " ".join([t for t in sentence.lower().split() if valid_checker.match(t)])
+                preproc_lines.append(preproc_line)
+                preproc_lines.append("\t")
+            return " ".join(preproc_lines) + "\n"
+        else:
+            return None
 
     with open(infile, 'r') as f:
         with open(outfile, 'w') as g:
-            for i, line in enumerate(f):
-                if line:
-                    sentences = tokenize(line)
-                    preproc_lines = []
-                    for sentence in sentences:
-                        preproc_line = " ".join([t for t in sentence.lower().split() if valid_checker.match(t)])
-                        preproc_lines.append(preproc_line)
-                        preproc_lines.append("\t")
-                    g.write(" ".join(preproc_lines) + "\n")
-                if i % 10000 == 0:
-                    print(i)
+            with Pool(16) as pool:
+                for out_line in tqdm(pool.imap(preproc_one, f, chunksize=128)):
+                    if out_line is not None:
+                        g.write(out_line)
 
-if __name__ == "__main__":
-    
+
+def main():
     noteevents_file = sys.argv[1]
     print('First stage of preprocessing')
     prepreproc(noteevents_file, 'mimic_raw_preprocessed.txt')
@@ -78,3 +89,7 @@ if __name__ == "__main__":
 
     with open('../data/testcorpus.json', 'w') as f:
         json.dump((final_corrected, final_misspellings, detection_contexts, final_line_idxs), f)
+
+
+if __name__ == "__main__":
+    main()
