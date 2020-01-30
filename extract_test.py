@@ -19,21 +19,19 @@ def prepreproc(infile, outfile):
             text = re.sub("\n\n", "\n", text)
             g.write(text)
 
+def preproc_one(line):
+    if line:
+        sentences = tokenize(line)
+        preproc_lines = []
+        for sentence in sentences:
+            preproc_line = " ".join([t for t in sentence.lower().split() if valid_checker.match(t)])
+            preproc_lines.append(preproc_line)
+            preproc_lines.append("\t")
+        return " ".join(preproc_lines) + "\n"
+    else:
+        return None
 
 def preproc(infile, outfile):
-
-    def preproc_one(line):
-        if line:
-            sentences = tokenize(line)
-            preproc_lines = []
-            for sentence in sentences:
-                preproc_line = " ".join([t for t in sentence.lower().split() if valid_checker.match(t)])
-                preproc_lines.append(preproc_line)
-                preproc_lines.append("\t")
-            return " ".join(preproc_lines) + "\n"
-        else:
-            return None
-
     with open(infile, 'r') as f:
         with open(outfile, 'w') as g:
             with Pool(16) as pool:
